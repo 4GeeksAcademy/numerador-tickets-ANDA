@@ -7,11 +7,85 @@ from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 
+import smtplib
+
+import os
+
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+
+
 api = Blueprint('api', __name__)
 
 # Allow CORS requests to this API
 CORS(api)
 
+sender_email = os.getenv("SMTP_USERNAME")
+sender_password = os.getenv("SMTP_APP_PASSWORD")
+smtp_host = os.getenv("SMTP_HOST")
+smtp_port = os.getenv("SMTP_PORT")
+
+receivers_emails = ["test@gmail.com"]
+
+def send_singup_email(receivers_emails):
+    message  = MIMEMultipart("alternative")
+
+    message["Subject"] = "Bienvenido a Tickets Anda 🐬🌈"
+    message["From"] = os.getenv("SMTP_USERNAME")
+
+    message["To"] = ", ".join(receivers_emails)
+
+    html_content = """
+        <html>
+            <body>
+                <h1>¡Hola! 🐬🌈</h1>
+                <p>Este es un correo de prueba enviado desde el API de Ticket Anda.</p>
+                <p>¡Saludos!</p>
+            </body>
+        </html>
+    """
+
+    text_content = "¡Hola!\n🐬🌈 Este es un correo de prueba enviado desde el API de Ticket Anda.\n¡Saludos!"
+
+    message.attach(MIMEText(text_content, "plain"))
+    message.attach(MIMEText(html_content, "html"))
+
+    server = smtplib.SMTP(smtp_host, smtp_port)
+    server.starttls()
+    server.login(sender_email, sender_password)
+    server.sendmail(sender_email, receivers_emails, message.as_string())
+    server.quit()
+    
+                
+
+@api.route('/send-email', methods=['POST'])
+def send_email():
+    message  = MIMEMultipart("alternative")
+    message["Subject"] = "Prueba de envío de correo - Ticket Anda 🐬🌈"
+    message["From"] = ""
+    message["To"] = ", ".join(receivers_emails)
+    
+    html_content = """
+        <html>
+            <body>
+                <h1>¡Hola! 🐬🌈</h1>
+                <p>Este es un correo de prueba enviado desde el API de Ticket Anda.</p>
+                <p>¡Saludos!</p>
+            </body>
+        </html>
+    """
+
+    text = "¡Hola! 🐬🌈 Este es un correo de prueba enviado desde el API de Ticket Anda.¡Saludos!"
+
+    message.attach(MIMEText(text, "plain"))
+    message.attach(MIMEText(html_content, "html"))
+    
+    server = smtplib.SMTP(smtp_host, smtp_port)
+    server.starttls()
+    server.login(sender_email, sender_password)
+    server.sendmail(sender_email, receivers_emails, message.as_string())
+    server.quit()
+    return jsonify({"msg": "Correo enviado exitosamente"}), 200
 
 @api.route("/upload", methods=["POST"])
 def upload_image():
@@ -48,6 +122,7 @@ def signup():
     new_user = User(doc_id=doc_id, name=name, email=email, password=password)
     db.session.add(new_user)
     db.session.commit()
+    send_singup_email([email])
 
     return jsonify({"message": "Usuario creado exitosamente!"}), 201
 
