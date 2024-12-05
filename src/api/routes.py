@@ -25,14 +25,15 @@ sender_password = os.getenv("SMTP_APP_PASSWORD")
 smtp_host = os.getenv("SMTP_HOST")
 smtp_port = os.getenv("SMTP_PORT")
 
-receivers_emails = ["test@gmail.com"]
+receivers_emails = os.getenv("RECIEVERS_EMAIL").split(",")
 
 def send_singup_email(receivers_emails):
     message  = MIMEMultipart("alternative")
 
     message["Subject"] = "Bienvenido a Tickets Anda 🐬🌈"
-    message["From"] = os.getenv("SMTP_USERNAME")
-
+    message["From"] = "budaenpantuflas@gmail.com"
+    message["Reply-To"] = "budaenpantuflas@gmail.com"
+  
     message["To"] = ", ".join(receivers_emails)
 
     html_content = """
@@ -54,6 +55,7 @@ def send_singup_email(receivers_emails):
     server.starttls()
     server.login(sender_email, sender_password)
     server.sendmail(sender_email, receivers_emails, message.as_string())
+    print(f"Correo enviado a: {receivers_emails}")
     server.quit()
     
                 
@@ -62,7 +64,7 @@ def send_singup_email(receivers_emails):
 def send_email():
     message  = MIMEMultipart("alternative")
     message["Subject"] = "Prueba de envío de correo - Ticket Anda 🐬🌈"
-    message["From"] = ""
+    message["From"] = "budaenpantuflas@gmail.com"
     message["To"] = ", ".join(receivers_emails)
     
     html_content = """
@@ -112,9 +114,13 @@ def signup():
     email = data.get('email')
     password = data.get('password')
 
-    existing_user = User.query.filter((User.doc_id == doc_id)).first()
-    if existing_user:
-        return jsonify({"msg": "Usuario ya existe"}), 401
+    existing_user_by_doc = User.query.filter_by(doc_id=doc_id).first()
+    if existing_user_by_doc:
+        return jsonify({"msg": "Error: El documento de identidad ya está registrado. Por favor, usa otro documento o inicia sesión."}), 401
+    
+    existing_user_by_email = User.query.filter_by(email=email).first()
+    if existing_user_by_email:
+        return jsonify({"msg": "Error: El correo ya está registrado. Por favor, usa otro correo o inicia sesión."}), 400
     
     if name == None:
         name = "Unknown"
