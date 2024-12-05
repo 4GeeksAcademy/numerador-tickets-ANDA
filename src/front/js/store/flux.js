@@ -2,24 +2,31 @@ const getState = ({ getStore, getActions, setStore }) => {
     return {
         store: {
             sucursales: [
-                'Artigas',
-                'Bella unión',
-                'Atlántida',
-                'Canelones',
-                'Ciudad de la costa',
-                'Las piedras',
-                'Pando',
-                'Santa Lucía',
-                'Salinas',
-                'San Ramón',
-                'Montevideo - Nuevo Centro Shopping',
-                'Montevideo - Tres Cruces Shopping',
-                'Montevideo - Arenal grande',
-                'Montevideo - Portones Shopping',
+                "Casa Central",
+                "Alquileres",
+                "Centro",
+                "Canelones",
+                "Cerro Largo",
+                "Colonia",
+                "Durazno",
+                "Flores",
+                "Florida",
+                "Lavalleja",
+                "Maldonado",
+                "Paysandu",
+                "Rio Negro",
+                "Rivera",
+                "Rocha",
+                "Salto",
+                "San Jose",
+                "Soriano",
+                "Tacuarembo",
+                "Treinta y Tres",
             ],
             user: null,
-            selectedDate: null,  // Asegúrate de inicializar esto como null
-            selectedService: '',  
+            selectedDate: null,  
+            selectedService: '',
+            selectedBranch: '',   
             logoUrl: '',
             token: '',
             reservations: [],
@@ -120,9 +127,12 @@ const getState = ({ getStore, getActions, setStore }) => {
             setSelectedService: (service) => {
                 setStore({ selectedService: service });
             },
-            addReservation: (date, time, specialty) => {
+            setSelectedBranch: (item) => {
+                setStore({ selectedBranch: item });
+            },
+            addReservation: (date, time, specialty, branch) => {
                 const store = getStore();
-                const newReservations = [...store.reservations, { date, time, specialty }];
+                const newReservations = [...store.reservations, { date, time, specialty, branch }];
                 setStore({ reservations: newReservations });
             },
             deleteReservation: (index) => {

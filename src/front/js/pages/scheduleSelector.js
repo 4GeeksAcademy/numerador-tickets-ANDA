@@ -28,7 +28,7 @@ const ScheduleSelector = () => {
   };
 
   const handleReservation = () => {
-    actions.addReservation(store.selectedDate, selectedTime, store.selectedService);  // Añadir store.selectedService
+    actions.addReservation(store.selectedDate, selectedTime, store.selectedService, store.selectedBranch); 
     setIsReserved(true);
   };
 
@@ -54,6 +54,7 @@ const ScheduleSelector = () => {
           )}
           <p className="text-center">HORA: {selectedTime}</p>
           <p className="text-center">ESPECIALIDAD: {store.selectedService}</p>
+          <p className="text-center">SUCURSAL: {store.selectedBranch}</p>
           <button onClick={handleViewReservations} className="btn btn-primary w-100 mt-2 btn-sm">
             Ver Mis Reservas
           </button>
