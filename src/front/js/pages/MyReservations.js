@@ -1,5 +1,6 @@
 import React, { useContext, useState, useEffect } from "react";
 import { Context } from "../store/appContext";
+import { Link } from "react-router-dom";
 
 const MyReservations = () => {
   const { store, actions } = useContext(Context);
@@ -15,6 +16,7 @@ const MyReservations = () => {
   };
 
   return (
+
     <div className="d-flex justify-content-center align-items-center min-vh-100 m-0">
       <div
         className="card p-3 shadow-lg border-0"
@@ -48,6 +50,11 @@ const MyReservations = () => {
             <li className="list-group-item">No hay ninguna reserva realizada.</li>
           )}
         </ul>
+      </div>
+      <div className="mt-3 text-center">
+        <button type="button" className="btn celeste">
+            <Link to="/elegir-servicio">Agende una nueva reserva</Link>
+        </button>
       </div>
     </div>
   );
