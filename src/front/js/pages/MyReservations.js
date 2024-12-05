@@ -37,6 +37,7 @@ const MyReservations = () => {
                   <p className="m-0">Fecha: {new Date(reservation.date).toLocaleDateString()}</p> {/* Convertir a cadena */}
                   <p className="m-0">Hora: {reservation.time}</p>
                   <p className="m-0">Especialidad: {reservation.specialty}</p> {/* Mostrar la especialidad */}
+                  <p className="m-0">Sucursal: {reservation.branch}</p> {/* Mostrar la Sucursal */}
                 </div>
                 <button
                   onClick={() => handleDeleteReservation(index)}

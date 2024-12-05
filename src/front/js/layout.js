@@ -12,9 +12,8 @@ import CalendarSelector from "./pages/CalendarSelector";
 import EditProfile from "./pages/editProfile";
 import { NotFound } from "./pages/notFound";
 import MyReservations from "./pages/MyReservations";
-import { Sucursales } from "./pages/elegirSucursales";
-
-import { ElegirServicio } from "./pages/agenda/elegirServicio";
+import  Sucursales  from "./pages/elegirSucursales";
+import { ElegirServicio } from "./pages/elegirServicio";
 
 import { Navbar } from "./component/navbar";
 import { Footer } from "./component/footer";
