@@ -32,13 +32,8 @@ const ScheduleSelector = () => {
     setIsReserved(true);
   };
 
-  const handleBackToHome = () => {
-    console.log("Volver a la página de inicio");
-    navigate("/");
-  };
-
   const handleViewReservations = () => {
-    navigate("/mis-reservas");
+    navigate("/");
   };
 
   if (isReserved) {
@@ -59,9 +54,6 @@ const ScheduleSelector = () => {
           )}
           <p className="text-center">HORA: {selectedTime}</p>
           <p className="text-center">ESPECIALIDAD: {store.selectedService}</p>
-          <button onClick={handleBackToHome} className="btn btn-outline-primary w-100 mt-2 btn-sm">
-            Volver a la página de inicio
-          </button>
           <button onClick={handleViewReservations} className="btn btn-primary w-100 mt-2 btn-sm">
             Ver Mis Reservas
           </button>

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import document from "../../../img/document.png";
 import odonto from "../../../img/odonto.png";
 import medico from "../../../img/medico.png";
-import { Context } from "../../store/appContext";  // Corregir la ruta aquí
+import { Context } from "../../store/appContext"; 
 
 export const ElegirServicio = () => {
     const { actions } = useContext(Context);
@@ -11,7 +11,7 @@ export const ElegirServicio = () => {
 
     const handleSelectService = (service) => {
         actions.setSelectedService(service);
-        navigate("/fecha");  // Navega al calendario
+        navigate("/sucursales");  
     };
 
     return (

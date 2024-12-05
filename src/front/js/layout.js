@@ -2,8 +2,7 @@ import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import ScrollToTop from "./component/scrollToTop";
 import { BackendURL } from "./component/backendURL";
-
-import { Home } from "./pages/home";  
+ 
 import { Signup } from "./pages/signup";
 import { Login } from "./pages/login";
 import ChangePassword from "./pages/changePassword";
@@ -13,6 +12,7 @@ import CalendarSelector from "./pages/CalendarSelector";
 import EditProfile from "./pages/editProfile";
 import { NotFound } from "./pages/notFound";
 import MyReservations from "./pages/MyReservations";
+import { Sucursales } from "./pages/elegirSucursales";
 
 import { ElegirServicio } from "./pages/agenda/elegirServicio";
 
@@ -41,22 +41,36 @@ const Layout = () => {
                         
                         {/* Páginas con Navbar */}
                         <Route element={<WithNavbar />}>
-                            <Route path="/agenda" element={<ScheduleSelector />} />
-                            <Route path="/fecha" element={<CalendarSelector />} />
-                            <Route path="/mis-reservas" element={<MyReservations />} />
+                            <Route element={
+                                <ProtectedRoute>
+                                    {/* Página de Agenda */}
+                                    <ScheduleSelector />
+                                </ProtectedRoute>
+                            } path="/agenda" />
+                            <Route element={
+                                <ProtectedRoute>
+                                    {/* Página de Agenda */}
+                                    <CalendarSelector />
+                                </ProtectedRoute>
+                            } path="/fecha" />
+                            <Route element={
+                                <ProtectedRoute>
+                                    {/* Página de Agenda */}
+                                    <MyReservations />
+                                </ProtectedRoute>
+                            } path="/" />
+                            <Route element={
+                                <ProtectedRoute>
+                                    {/* Página de Agenda */}
+                                    <Sucursales />
+                                </ProtectedRoute>
+                            } path="/sucursales" />
                             <Route element={
                                 <ProtectedRoute>
                                     {/* Página de Agenda */}
                                     <EditProfile />
                                 </ProtectedRoute>
                             } path="/editar-perfil" />
-
-                            <Route element={
-                                <ProtectedRoute>
-                                    {/* Página de Home (Edición de perfil) */}
-                                    <Home />
-                                </ProtectedRoute>
-                            } path="/" />
 
                             {/* Página para cambiar la contraseña */}
                             <Route element={
