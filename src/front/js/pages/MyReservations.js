@@ -16,8 +16,7 @@ const MyReservations = () => {
   };
 
   return (
-
-    <div className="d-flex justify-content-center align-items-center min-vh-100 m-0">
+    <div className="d-flex flex-column align-items-center min-vh-100">
       <div
         className="card p-3 shadow-lg border-0"
         style={{ maxWidth: "400px", width: "100%" }}
@@ -32,12 +31,20 @@ const MyReservations = () => {
         <ul className="list-group">
           {reservations.length > 0 ? (
             reservations.map((reservation, index) => (
-              <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
+              <li
+                key={index}
+                className="list-group-item d-flex justify-content-between align-items-center"
+              >
                 <div>
-                  <p className="m-0">Fecha: {new Date(reservation.date).toLocaleDateString()}</p> {/* Convertir a cadena */}
+                  <p className="m-0">
+                    Fecha: {new Date(reservation.date).toLocaleDateString()}
+                  </p>{" "}
+                  {/* Convertir a cadena */}
                   <p className="m-0">Hora: {reservation.time}</p>
-                  <p className="m-0">Especialidad: {reservation.specialty}</p> {/* Mostrar la especialidad */}
-                  <p className="m-0">Sucursal: {reservation.branch}</p> {/* Mostrar la Sucursal */}
+                  <p className="m-0">Especialidad: {reservation.specialty}</p>{" "}
+                  {/* Mostrar la especialidad */}
+                  <p className="m-0">Sucursal: {reservation.branch}</p>{" "}
+                  {/* Mostrar la Sucursal */}
                 </div>
                 <button
                   onClick={() => handleDeleteReservation(index)}
@@ -52,10 +59,10 @@ const MyReservations = () => {
           )}
         </ul>
       </div>
-      <div className="mt-3 text-center">
-        <button type="button" className="btn celeste">
-            <Link to="/elegir-servicio">Agende una nueva reserva</Link>
-        </button>
+      <div className="mt-4">
+        <Link to="/elegir-servicio" className="btn btn-primary">
+          Agende una nueva reserva
+        </Link>
       </div>
     </div>
   );

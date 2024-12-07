@@ -24,7 +24,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                 "Treinta y Tres",
             ],
             user: null,
-            selectedDate: null,  
+            selectedDate: null, 
             selectedService: '',
             selectedBranch: '',   
             logoUrl: '',
@@ -37,7 +37,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     const response = await fetch(`${process.env.BACKEND_URL}api/signup`, {
                         method: "POST",
                         headers: {
-                            "Content-Type": "application/json",
+                            "Content-Type": "application/json", 
                         },
                         body: JSON.stringify({ doc_id, name, email, password }),
                     });
