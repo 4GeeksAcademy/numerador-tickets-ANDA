@@ -167,3 +167,6 @@ def get_current_user():
         }), 200
     print("User not found in the database.")
     return jsonify({"msg": "User not found"}), 404
+
+    #Agregar clase POST, DELETE y GET para reservas. Post en vista crear reserva, 
+    # delete en el onclick del botón en "mis reservas" y Get en la vista de "mis reservas"
