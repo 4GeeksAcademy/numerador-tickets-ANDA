@@ -33,14 +33,14 @@ class User(db.Model):
             # do not serialize the password, its a security breach
         }
     
-class Appointments(db.Model):
+class Appointment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     datetime = db.Column(db.DateTime, unique=True, nullable=False)
     branch = db.Column(db.String(120), unique=True, nullable=False)
     speciality = db.Column(db.String(80), unique=False, nullable=False)
 
-    user = db.relationship('User', backref=db.backref('appointments', lazy=True))
+    user = db.relationship('User', backref=db.backref('appointment', lazy=True))
    
     def __init__(self, user_id, datetime, branch, speciality):
         self.user_id = user_id
@@ -49,14 +49,14 @@ class Appointments(db.Model):
         self.speciality = speciality
 
     def __repr__(self):
-        return f'<Appointments {self.id}>'
+        return f'<Appointment {self.id}>'
     
 
     def serialize(self):
         return {
             "id": self.id,
             "user_id": self.user_id,
-            "datetime" : self.datetime,
+            "datetime" : self.datetime.isoformat(),
             "branch": self.branch,
             "speciality": self.speciality,
           
