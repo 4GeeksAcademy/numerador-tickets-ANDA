@@ -4,10 +4,8 @@ Documentación de parámetros básicos de funcionamiento del codespace:
 
 Dependencias:
 1) pip install flask-jwt-extended
-1) pip install cloudinary 
-
-Actualizar pip:
-1) pip install --upgrade pip
+2) pip install cloudinary 
+3) pip install Werkzeug
 
 Cambios en la DB:
 1) pipenv run migrate
