@@ -24,8 +24,10 @@ const CalendarSelector = () => {
     };
 
     const handleReservation = () => {
-        // Guardamos fecha y especialidad en el store como un objeto Date
-        actions.setSelectedDate(selectedDate);  // Esto asegurará que selectedDate esté en el store
+        
+        const formattedDate = format(selectedDate, "yyyy/MM/dd");
+        console.log("Fecha seleccionada:", formattedDate); 
+        actions.setSelectedDate(formattedDate);
         navigate("/agenda");
     };
 

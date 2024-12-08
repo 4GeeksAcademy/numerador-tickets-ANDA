@@ -2,7 +2,7 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User
+from api.models import db, User, Appointment
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
@@ -162,6 +162,7 @@ def get_current_user():
     user = User.query.filter_by(doc_id=current_user).first()
     if user:
         return jsonify({
+            "id": user.id,
             "doc_id": user.doc_id,
             "name": user.name
         }), 200
@@ -170,3 +171,58 @@ def get_current_user():
 
     #Agregar clase POST, DELETE y GET para reservas. Post en vista crear reserva, 
     # delete en el onclick del botón en "mis reservas" y Get en la vista de "mis reservas"
+@api.route('/appointments', methods=['POST'])
+def create_appointment():
+
+    data = request.json
+    user_id = data.get('user_id')
+    datetime = data.get('datetime')
+    branch = data.get('branch')
+    speciality = data.get('speciality')
+
+    if not all([user_id, datetime, branch, speciality]):
+        return jsonify({"msg": "Todos los campos son requeridos"}), 400
+
+    try:
+         # Ya existe?
+        existing_appointment = Appointment.query.filter_by(datetime=datetime, branch=branch).first()
+        if existing_appointment:
+            return jsonify({"msg": "La fecha y hora seleccionada ya están ocupadas"}), 400
+
+        new_appointment = Appointment(user_id=user_id, datetime=datetime, branch=branch, speciality=speciality)
+        db.session.add(new_appointment)
+        db.session.commit()
+
+        return jsonify(new_appointment.serialize()), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"msg": str(e)}), 500
+
+@api.route('/appointments', methods=['GET'])
+@jwt_required()
+def get_appointments():
+    
+    current_user = get_jwt_identity()
+    user = User.query.filter_by(doc_id=current_user).first()
+
+    if not user:
+        return jsonify({"msg": "Usuario no encontrado"}), 404
+
+    appointments = Appointment.query.filter_by(user_id=user.id).all()
+    return jsonify([appointment.serialize() for appointment in appointments]), 200
+
+@api.route('/appointments/<int:appointment_id>', methods=['DELETE'])
+@jwt_required()
+def delete_appointment(appointment_id):
+ 
+    try:
+        appointment = Appointment.query.get(appointment_id)
+        if not appointment:
+            return jsonify({"msg": "Reserva no encontrada"}), 404
+
+        db.session.delete(appointment)
+        db.session.commit()
+        return jsonify({"msg": "Reserva eliminada exitosamente"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"msg": str(e)}), 500
