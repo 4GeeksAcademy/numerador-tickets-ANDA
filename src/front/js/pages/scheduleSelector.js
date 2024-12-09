@@ -42,6 +42,7 @@ const ScheduleSelector = () => {
       setMsg(response.message);
   } else {
       setMsg("Reserva creada correctamente.");
+      //store.actions.enviarMailReserva()
       navigate("/");
   }
   };
