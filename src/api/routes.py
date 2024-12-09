@@ -229,3 +229,4 @@ def delete_appointment(appointment_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({"msg": str(e)}), 500
+#hacer nuevo endpoint para mandar correos de reserva.

@@ -270,6 +270,8 @@ const getState = ({ getStore, getActions, setStore }) => {
                     return { success: false, message: "Error inesperado al eliminar la reserva" };
                 }
             },
+            //Hacer un action para enviarMailReserva
+            //const response = await fetch(`${process.env.BACKEND_URL}api/sendMailAppointment`, {
         }
     };
 };
