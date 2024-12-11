@@ -1,93 +1,133 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom"; 
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import "../../styles/index.css";
 
 const EditProfile = () => {
-    // Mensaje de exito o error
+    // Mensaje de éxito o error
     const [message, setMessage] = useState("");
 
     // Campos de formulario
+    const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [phone, setPhone] = useState("");
     const [address, setAddress] = useState("");
 
-    // Guarda los valores iniciales para comparar con los cambios
-    const [initialEmail, setInitialEmail] = useState("");
-    const [initialPhone, setInitialPhone] = useState("");
-    const [initialAddress, setInitialAddress] = useState("");
+    const navigate = useNavigate();
 
-    // Funcion para manejar el cambio de los campos
+    // Cargar los datos actuales del usuario al montar el componente
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const response = await fetch('https://cuddly-bassoon-97q56gp9v9v4c79px-3001.app.github.dev/api/me', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    setName(data.name);
+                    setEmail(data.email);
+                    setPhone(data.phone);
+                    setAddress(data.address);
+                } else {
+                    const data = await response.json();
+                    setMessage(data.msg || "Error al cargar los datos del perfil.");
+                    // Redirigir al login si hay un error
+                    setTimeout(() => {
+                        navigate('/login');
+                    }, 3000);
+                }
+            } catch (error) {
+                console.error("Error de conexión:", error);
+                setMessage("Error de conexión. Intenta nuevamente.");
+            }
+        };
+
+        fetchUserData();
+    }, [navigate]);
+
+    // Función para manejar el cambio de los campos
     const handleInputChange = (e) => {
         const { id, value } = e.target;
-
-        if (id === "email") {
-            setEmail(value);
-        } else if (id === "phone") {
-            setPhone(value);
-        } else if (id === "address") {
-            setAddress(value);
-        }
+        if (id === "name") setName(value);
+        if (id === "email") setEmail(value);
+        if (id === "phone") setPhone(value);
+        if (id === "address") setAddress(value);
     };
 
-    // Funcion para validar el telefono (solo números)
-    const validatePhone = (phone) => {
-        const phoneRegex = /^[0-9]+$/; 
-        return phoneRegex.test(phone);
-    };
-
-    // Funcion que se llama cuando se presiona "Confirmar cambios"
-    const handleConfirmChanges = () => {
-        // Validar que el correo tenga un formato valido
+    // Función que se llama cuando se presiona "Confirmar cambios"
+    const handleConfirmChanges = async () => {
+        // Validar que el correo tenga un formato válido
         const emailRegex = /^[a-zA-Z0-9._%+-]+@(gmail.com|hotmail.com|yahoo.com)$/;
         if (!email.match(emailRegex)) {
             setMessage("El correo debe ser un correo válido");
             return;
         }
 
-        // Validar que el telefono solo contenga numeros
+        // Validar que el teléfono solo contenga números
+        const validatePhone = (phone) => /^[0-9]+$/.test(phone);
         if (!validatePhone(phone)) {
             setMessage("El teléfono debe contener solo números.");
             return;
         }
 
-        // Validar que los campos no esten vacios
-        if (!email || !phone || !address) {
+        // Validar que los campos no estén vacíos
+        if (!name || !email || !phone || !address) {
             setMessage("Todos los campos deben estar llenos.");
             return;
         }
 
-        // Verificar si el usuario ha modificado algun campo
-        if (email === initialEmail && phone === initialPhone && address === initialAddress) {
-            setMessage("No se han realizado cambios.");
-            return;
+        try {
+            const response = await fetch('https://cuddly-bassoon-97q56gp9v9v4c79px-3001.app.github.dev/api/user/edit', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify({ name, email, phone, address })
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                setMessage("Datos modificados con éxito!");
+            } else {
+                setMessage(data.msg || "Error al actualizar el perfil.");
+                // Redirigir al login si hay un error
+                setTimeout(() => {
+                    navigate('/login');
+                }, 3000);
+            }
+        } catch (error) {
+            setMessage("Error de conexión. Intenta nuevamente.");
         }
 
-        setMessage("Datos modificados con éxito!");
-
-        // Limpia el mensaje despues de 3 segundos
+        // Limpia el mensaje después de 3 segundos
         setTimeout(() => {
             setMessage(""); 
         }, 3000);
-
-        // Actualiza los valores iniciales con los nuevos cambios
-        setInitialEmail(email);
-        setInitialPhone(phone);
-        setInitialAddress(address);
     };
 
     return (
         <div className="edit-profile-container">
             <h2 className="text-blue">Modificar datos personales</h2>
-            
-           
             {message && (
-                <div style={{ marginBottom: "10px" }} className={`alert ${message.includes("exito") ? "alert-success" : "alert-danger"}`}>
+                <div style={{ marginBottom: "10px" }} className={`alert ${message.includes("éxito") ? "alert-success" : "alert-danger"}`}>
                     {message}
                 </div>
             )}
-
-
             <form>
+                <div className="mb-3">
+                    <label htmlFor="name" className="form-label text-blue">Nombre</label>
+                    <input
+                        type="text"
+                        className="form-control"
+                        id="name"
+                        value={name}
+                        onChange={handleInputChange}
+                    />
+                </div>
                 <div className="mb-3">
                     <label htmlFor="email" className="form-label text-blue">Email</label>
                     <input
@@ -128,7 +168,7 @@ const EditProfile = () => {
                     <button
                         type="button"
                         className="btn btn-primary"
-                        onClick={handleConfirmChanges} // Llama a la funcion que maneja los cambios
+                        onClick={handleConfirmChanges}
                     >
                         Confirmar cambios
                     </button>
