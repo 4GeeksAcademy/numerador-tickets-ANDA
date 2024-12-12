@@ -270,6 +270,39 @@ const getState = ({ getStore, getActions, setStore }) => {
                     return { success: false, message: "Error inesperado al eliminar la reserva" };
                 }
             },
+            changePassword: async (oldPassword, newPassword, confirmPassword) => {
+                const store = getStore();
+            
+                // Validaciones iniciales
+                if (!oldPassword || !newPassword || !confirmPassword) {
+                    return { success: false, message: "Todos los campos son obligatorios." };
+                }
+            
+                if (newPassword !== confirmPassword) {
+                    return { success: false, message: "Las contraseñas no coinciden." };
+                }
+            
+                try {
+                    const response = await fetch(`${process.env.BACKEND_URL}/api/change-password`, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${store.token}`,
+                        },
+                        body: JSON.stringify({ old_password: oldPassword, new_password: newPassword }),
+                    });
+            
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        return { success: false, message: errorData.msg || "Error al cambiar la contraseña." };
+                    }
+            
+                    return { success: true, message: "Contraseña modificada con éxito." };
+                } catch (error) {
+                    console.error("Error al cambiar la contraseña:", error);
+                    return { success: false, message: "Hubo un error al conectar con el servidor." };
+                }
+            },
             //Hacer un action para enviarMailReserva
             //const response = await fetch(`${process.env.BACKEND_URL}api/sendMailAppointment`, {
         }
