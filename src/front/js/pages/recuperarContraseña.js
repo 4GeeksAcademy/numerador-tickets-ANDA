@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { Context } from "../store/appContext";
 
 const ResetPassword = () => {
-    const [newPassword, setNewPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
+    const {actions, store}= useContext(Context)
+    const [email, setEmail] = useState("");
+   
     const [successMessage, setSuccessMessage] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
     const [loading, setLoading] = useState(false);
@@ -16,35 +18,22 @@ const ResetPassword = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!newPassword || !confirmPassword) {
+        if (!email) {
             setErrorMessage("Los campos no pueden estar vacíos.");
             setSuccessMessage("");
             return;
         }
 
-        if (newPassword !== confirmPassword) {
-            setErrorMessage("Las contraseñas no coinciden.");
-            setSuccessMessage("");
-            return;
-        }
 
         try {
             setLoading(true);
             setErrorMessage("");
+            let resp= await actions.recuperar(email, token)
+           
 
-            const response = await fetch('/api/restablecer-contrasena', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    password: newPassword,
-                    token
-                })
-            });
-
-            if (response.ok) {
-                setSuccessMessage("Contraseña modificada con éxito.");
-                setNewPassword("");
-                setConfirmPassword("");
+            if (resp) {
+                setSuccessMessage("Email enviado con exito");
+               
 
                 setTimeout(() => navigate("/login"), 2000);
             } else {
@@ -76,18 +65,18 @@ const ResetPassword = () => {
 
                 <form onSubmit={handleSubmit}>
                     <div className="form-group mb-3">
-                        <label htmlFor="newPassword">Nueva Contraseña</label>
+                        <label htmlFor="newPassword">Email</label>
                         <input
-                            type="password"
-                            id="newPassword"
+                            type="email"
+                            id="email"
                             className="form-control"
-                            placeholder="Introduce la nueva contraseña"
-                            value={newPassword}
-                            onChange={(e) => setNewPassword(e.target.value)}
+                            placeholder="Ingrese su email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                         />
                     </div>
 
-                    <div className="form-group mb-3">
+                    {/* <div className="form-group mb-3">
                         <label htmlFor="confirmPassword">Confirmar Contraseña</label>
                         <input
                             type="password"
@@ -97,7 +86,7 @@ const ResetPassword = () => {
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
                         />
-                    </div>
+                    </div> */}
 
                     <button
                         type="submit"

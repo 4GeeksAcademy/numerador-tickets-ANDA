@@ -270,6 +270,27 @@ const getState = ({ getStore, getActions, setStore }) => {
                     return { success: false, message: "Error inesperado al eliminar la reserva" };
                 }
             },
+
+            recuperar: async(mail, token)=>{
+                try {
+                    const response = await fetch(process.env.BACKEND_URL+'api/restablecer-contrasena', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            mail: mail,
+                            token
+                        })
+                    });
+                    console.log(response)
+
+                    if(response.status==200){
+                        return true
+                    }
+                } catch (error) {
+                    console.log(error)
+                    return false
+                }
+            }
             //Hacer un action para enviarMailReserva
             //const response = await fetch(`${process.env.BACKEND_URL}api/sendMailAppointment`, {
         }

@@ -224,4 +224,20 @@ def delete_appointment(appointment_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({"msg": str(e)}), 500
+    
+
+@api.route('/restablecer-contrasena', methods=['POST'])
+def reset_password():
+    data = request.json
+    email = data.get('email')
+
+    existing_user_by_email = User.query.filter_by(email=email).first()
+    if existing_user_by_email is None:
+        return jsonify({"msg": "Error: El correo no esta registrado"}), 404
+    
+    
+    send_singup_email([email])
+
+    return jsonify({"message": "Email enviado exitosamente!"}), 201
+
 #hacer nuevo endpoint para mandar correos de reserva.

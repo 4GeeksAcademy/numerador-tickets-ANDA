@@ -19,6 +19,7 @@ import { Navbar } from "./component/navbar";
 import { Footer } from "./component/footer";
 import { WithNavbar } from "./component/withNavbar";
 import ProtectedRoute from "./component/protectedRoute";
+import ResetPassword from "./pages/recuperarContraseña";
 
 //create your first component
 const Layout = () => {
@@ -78,6 +79,14 @@ const Layout = () => {
                                     <ChangePassword />
                                 </ProtectedRoute>
                             } path="/change-password" />
+
+                             {/* Página para recuperar la contraseña */}
+                             <Route element={
+                                <ProtectedRoute>
+                                    {/* Página de recuperar contraseña */}
+                                    <ResetPassword />
+                                </ProtectedRoute>
+                            } path="/reset-password" />
 
                             <Route element={
                                 <ProtectedRoute>
