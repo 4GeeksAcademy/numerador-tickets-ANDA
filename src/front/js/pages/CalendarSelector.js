@@ -1,6 +1,6 @@
 import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { format, startOfMonth, endOfMonth, addDays, subMonths, addMonths, isSameDay } from "date-fns";
+import { format, startOfMonth, endOfMonth, addDays, subMonths, addMonths, isSameDay, isBefore } from "date-fns";
 import { Context } from "../store/appContext";
 import "../../styles/ScheduleDate.css";
 import logoAnda from "../../img/logo_anda.png";
@@ -11,6 +11,7 @@ const CalendarSelector = () => {
     const { store, actions } = useContext(Context);
     const navigate = useNavigate();
 
+    const today = new Date();
     const startDate = startOfMonth(currentMonth);
     const endDate = endOfMonth(currentMonth);
 
@@ -20,13 +21,14 @@ const CalendarSelector = () => {
     }
 
     const handleDateClick = (day) => {
-        setSelectedDate(day);
+        if (!isBefore(day, today) || isSameDay(day, today)) {
+            setSelectedDate(day);
+        }
     };
 
     const handleReservation = () => {
-        
         const formattedDate = format(selectedDate, "yyyy/MM/dd");
-        console.log("Fecha seleccionada:", formattedDate); 
+        console.log("Fecha seleccionada:", formattedDate);
         actions.setSelectedDate(formattedDate);
         navigate("/agenda");
     };
@@ -42,20 +44,14 @@ const CalendarSelector = () => {
     return (
         <div className="container my-5 d-flex justify-content-center">
             <div className="card p-4 shadow-lg text-center">
-                <img
-                    src={logoAnda}
-                    alt="Logo ANDA"
-                    className="logo-anda mb-4"
-                />
+                <img src={logoAnda} alt="Logo ANDA" className="logo-anda mb-4" />
                 <div className="d-flex justify-content-between align-items-center mb-4">
                     <button onClick={handlePrevMonth} className="btn btn-outline-primary">
                         Mes anterior
                     </button>
-                    <h4 className="text-primary mb-0">
-                        {format(currentMonth, "MMMM yyyy")}
-                    </h4>
+                    <h4 className="text-primary mb-0">{format(currentMonth, "MMMM yyyy")}</h4>
                     <button onClick={handleNextMonth} className="btn btn-outline-primary">
-                        Mes siguiente 
+                        Mes siguiente
                     </button>
                 </div>
                 <div className="calendar-grid">
@@ -64,8 +60,14 @@ const CalendarSelector = () => {
                             key={index}
                             className={`calendar-day ${
                                 isSameDay(day, selectedDate) ? "selected-day" : ""
+                            } ${
+                                isBefore(day, today) && !isSameDay(day, today) ? "disabled-day" : ""
                             }`}
-                            onClick={() => handleDateClick(day)}
+                            onClick={() => {
+                                if (!isBefore(day, today) || isSameDay(day, today)) {
+                                    handleDateClick(day);
+                                }
+                            }}
                         >
                             {format(day, "d")}
                         </div>

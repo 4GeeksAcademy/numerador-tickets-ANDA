@@ -14,6 +14,7 @@ import { NotFound } from "./pages/notFound";
 import MyReservations from "./pages/MyReservations";
 import  Sucursales  from "./pages/elegirSucursales";
 import { ElegirServicio } from "./pages/elegirServicio";
+import AndaLocation from "./pages/AndaLocations";
 
 import { Navbar } from "./component/navbar";
 import { Footer } from "./component/footer";
@@ -85,6 +86,13 @@ const Layout = () => {
                                     <ElegirServicio />
                                 </ProtectedRoute>
                             } path="/elegir-servicio" />
+
+                            <Route element={
+                                <ProtectedRoute>
+                                    {/* Página de sucursales Anda */}
+                                    <AndaLocation />
+                                </ProtectedRoute>
+                            } path="/sucursales-anda" />
                         </Route>
                     </Routes>
                     <Footer />

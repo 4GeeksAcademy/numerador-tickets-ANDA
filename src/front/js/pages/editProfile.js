@@ -20,7 +20,7 @@ const EditProfile = () => {
     const handleInputChange = (e) => {
         const { id, value } = e.target;
 
-        if (id === "email") {
+        if (id === "email") { 
             setEmail(value);
         } else if (id === "phone") {
             setPhone(value);
