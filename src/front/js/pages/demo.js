@@ -12,7 +12,7 @@ export const Demo = () => {
 				{store.demo.map((item, index) => {
 					return (
 						<li
-							key={index} 
+							key={index}
 							className="list-group-item d-flex justify-content-between"
 							style={{ background: item.background }}>
 							<Link to={"/single/" + index}>

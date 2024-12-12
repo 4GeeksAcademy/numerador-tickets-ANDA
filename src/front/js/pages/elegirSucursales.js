@@ -20,7 +20,7 @@ const Sucursales = () => {
     };
     const branches = store.sucursales;
     return (
-      <div className="container mt-5"> 
+      <div className="container mt-5">
         <img
           src="https://logoteca.uy/wp-content/uploads/sites/3/2024/09/Logo-ANDA.svg"
           alt="Logo Anda"
