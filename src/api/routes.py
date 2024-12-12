@@ -266,3 +266,36 @@ def update_user():
         print(f"Error al actualizar el usuario: {e}")
         db.session.rollback()
         return jsonify({"msg": "Error interno del servidor"}), 500
+
+@api.route('/change-password', methods=['PUT'])
+@jwt_required()  
+def change_password():
+    try:
+        
+        doc_id = get_jwt_identity()
+
+        data = request.json
+        old_password = data.get('old_password')
+        new_password = data.get('new_password')
+
+        if not old_password or not new_password:
+            return jsonify({"msg": "Ambos campos, contraseña antigua y nueva, son obligatorios."}), 400
+
+        user = User.query.filter_by(doc_id=doc_id).one_or_none()
+        if not user:
+            return jsonify({"msg": "Usuario no encontrado."}), 404
+   
+        if not check_password_hash(user.password, old_password):
+            return jsonify({"msg": "La contraseña antigua es incorrecta."}), 401
+ 
+        hashed_password = generate_password_hash(new_password)
+        user.password = hashed_password
+   
+        db.session.commit()
+
+        return jsonify({"msg": "Contraseña actualizada con éxito."}), 200
+
+    except Exception as e:
+        print(f"Error al cambiar la contraseña: {e}")
+        db.session.rollback()
+        return jsonify({"msg": "Error interno del servidor."}), 500
