@@ -85,6 +85,7 @@ const Layout = () => {
                                     <ElegirServicio />
                                 </ProtectedRoute>
                             } path="/elegir-servicio" />
+
                         </Route>
                     </Routes>
                     <Footer />
