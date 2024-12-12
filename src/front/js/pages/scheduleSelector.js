@@ -17,19 +17,34 @@ const ScheduleSelector = () => {
     { time: "13:00", available: true },
     { time: "13:30", available: true },
   ];
+  
 
   const [selectedTime, setSelectedTime] = useState(null);
   const [isReserved, setIsReserved] = useState(false);
   const { store, actions } = useContext(Context);
   const navigate = useNavigate();
+  const [msg, setMsg] = useState("");
+  console.log(store.selectedDate, selectedTime, store.selectedService, store.selectedBranch)
 
   const handleSelect = (index) => {
     setSelectedTime(initialSchedule[index].time);
   };
 
-  const handleReservation = () => {
-    actions.addReservation(store.selectedDate, selectedTime, store.selectedService);  // Añadir store.selectedService
-    setIsReserved(true);
+  const handleReservation = async () => {
+    const response = await actions.createReservation(
+        store.selectedDate,
+        selectedTime,
+        store.selectedService,
+        store.selectedBranch
+    );
+
+    if(!response.success) {
+      setMsg(response.message);
+  } else {
+      setMsg("Reserva creada correctamente.");
+      //store.actions.enviarMailReserva()
+      navigate("/");
+  }
   };
 
   const handleViewReservations = () => {
@@ -39,6 +54,7 @@ const ScheduleSelector = () => {
   if (isReserved) {
     return (
       <div className="d-flex justify-content-center align-items-center min-vh-100 m-0">
+        {msg && <p style={{ color: msg.includes("correctamente") ? "green" : "red" }}>{msg}</p>}
         <div className="card p-3 shadow-lg border-0" style={{ maxWidth: "400px" }}>
           <img
             src="https://logoteca.uy/wp-content/uploads/sites/3/2024/09/Logo-ANDA.svg"
@@ -54,6 +70,7 @@ const ScheduleSelector = () => {
           )}
           <p className="text-center">HORA: {selectedTime}</p>
           <p className="text-center">ESPECIALIDAD: {store.selectedService}</p>
+          <p className="text-center">SUCURSAL: {store.selectedBranch}</p>
           <button onClick={handleViewReservations} className="btn btn-primary w-100 mt-2 btn-sm">
             Ver Mis Reservas
           </button>

@@ -2,26 +2,33 @@ const getState = ({ getStore, getActions, setStore }) => {
     return {
         store: {
             sucursales: [
-                'Artigas',
-                'Bella unión',
-                'Atlántida',
-                'Canelones',
-                'Ciudad de la costa',
-                'Las piedras',
-                'Pando',
-                'Santa Lucía',
-                'Salinas',
-                'San Ramón',
-                'Montevideo - Nuevo Centro Shopping',
-                'Montevideo - Tres Cruces Shopping',
-                'Montevideo - Arenal grande',
-                'Montevideo - Portones Shopping',
+                "Casa Central",
+                "Alquileres",
+                "Centro",
+                "Canelones",
+                "Cerro Largo",
+                "Colonia",
+                "Durazno",
+                "Flores",
+                "Florida",
+                "Lavalleja",
+                "Maldonado",
+                "Paysandu",
+                "Rio Negro",
+                "Rivera",
+                "Rocha",
+                "Salto",
+                "San Jose",
+                "Soriano",
+                "Tacuarembo",
+                "Treinta y Tres",
             ],
             user: null,
-            selectedDate: null,  // Asegúrate de inicializar esto como null
-            selectedService: '',  
+            selectedDate: null, 
+            selectedService: '',
+            selectedBranch: '',   
             logoUrl: '',
-            token: '',
+            token: localStorage.getItem("token") || "",
             reservations: [],
         },
         actions: {
@@ -30,7 +37,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     const response = await fetch(`${process.env.BACKEND_URL}api/signup`, {
                         method: "POST",
                         headers: {
-                            "Content-Type": "application/json",
+                            "Content-Type": "application/json", 
                         },
                         body: JSON.stringify({ doc_id, name, email, password }),
                     });
@@ -62,8 +69,8 @@ const getState = ({ getStore, getActions, setStore }) => {
                     }
 
                     const data = await response.json();
-                    localStorage.setItem("token", data.access_token); 
-                    setStore({ user: data.user }); 
+                    localStorage.setItem("token", data.access_token);
+                    setStore({ token: data.access_token, user: data.user }); 
                     return { success: true, message: "Inicio de sesión exitoso" };
                 } catch (error) {
                     console.log("Error al iniciar sesión:", error);
@@ -85,7 +92,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
 
                 try {
-                    const response = await fetch(`${process.env.BACKEND_URL}/api/me`, {
+                    const response = await fetch(`${process.env.BACKEND_URL}api/me`, {
                         method: "GET",
                         headers: {
                             "Content-Type": "application/json",
@@ -108,7 +115,7 @@ const getState = ({ getStore, getActions, setStore }) => {
             },
             logout: () => {
                 localStorage.removeItem("token");
-                setStore({ user: null });
+                setStore({ user: null, token: "" });
             },
             setSelectedDate: (date) => {
                 setStore({ selectedDate: date });
@@ -120,9 +127,12 @@ const getState = ({ getStore, getActions, setStore }) => {
             setSelectedService: (service) => {
                 setStore({ selectedService: service });
             },
-            addReservation: (date, time, specialty) => {
+            setSelectedBranch: (item) => {
+                setStore({ selectedBranch: item });
+            },
+            addReservation: (date, time, specialty, branch) => {
                 const store = getStore();
-                const newReservations = [...store.reservations, { date, time, specialty }];
+                const newReservations = [...store.reservations, { date, time, specialty, branch }];
                 setStore({ reservations: newReservations });
             },
             deleteReservation: (index) => {
@@ -160,6 +170,108 @@ const getState = ({ getStore, getActions, setStore }) => {
                 const store = getStore();
                 return store.logoUrl;
             },
+            createReservation: async (date, time, specialty, branch) => {
+                const store = getStore();
+                const token = localStorage.getItem("token");
+
+
+                if (!token) {
+                    console.error("Token no encontrado");
+                    return { success: false, message: "Debes iniciar sesión para reservar" };
+                }
+
+                try {
+                    const response = await fetch(`${process.env.BACKEND_URL}api/appointments`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${token}`,
+                        },
+                        body: JSON.stringify({
+                            user_id: store.user.id,
+                            datetime: `${date} ${time}:00.00`, //Si no ponemos segundos, decimas y centesimas harcodeadas da error de tipo.
+                            branch,
+                            speciality: specialty,
+                        }),
+                    });
+                    
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        return { success: false, message: data.msg || "Error al crear la reserva" };
+                    }
+
+                    const newReservations = [...store.reservations, data];
+                    setStore({ reservations: newReservations });
+
+                    return { success: true, message: "Reserva creada exitosamente" };
+                } catch (error) {
+                    console.error("Error al crear la reserva:", error);
+                    return { success: false, message: "Error inesperado al crear la reserva" };
+                }
+            },
+            fetchReservations: async () => {
+                const store = getStore();
+                const token = store.token;
+
+                if (!token) {
+                    console.error("Token no encontrado");
+                    return { success: false, message: "Debes iniciar sesión para ver las reservas" };
+                }
+
+                try {
+                    const response = await fetch(`${process.env.BACKEND_URL}api/appointments`, {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    });
+
+                    if (!response.ok) {
+                        throw new Error("Error al obtener reservas");
+                    }
+
+                    const data = await response.json();
+                    setStore({ reservations: data });
+                    return { success: true, data };
+                } catch (error) {
+                    console.error("Error al obtener reservas:", error);
+                    return { success: false, message: "Error inesperado al obtener reservas" };
+                }
+            },
+            deleteReservation: async (reservationId) => {
+                const store = getStore();
+                const token = store.token;
+
+                if (!token) {
+                    console.error("Token no encontrado");
+                    return { success: false, message: "Debes iniciar sesión para eliminar reservas" };
+                }
+
+                try {
+                    const response = await fetch(`${process.env.BACKEND_URL}api/appointments/${reservationId}`, {
+                        method: "DELETE",
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    });
+
+                    if (!response.ok) {
+                        const error = await response.json();
+                        return { success: false, message: error.msg || "Error al eliminar la reserva" };
+                    }
+
+                    //Actualizamos el estado con esto.
+                    const newReservations = store.reservations.filter((res) => res.id !== reservationId);
+                    setStore({ reservations: newReservations });
+
+                    return { success: true, message: "Reserva eliminada exitosamente" };
+                } catch (error) {
+                    console.error("Error al eliminar la reserva:", error);
+                    return { success: false, message: "Error inesperado al eliminar la reserva" };
+                }
+            },
+            //Hacer un action para enviarMailReserva
+            //const response = await fetch(`${process.env.BACKEND_URL}api/sendMailAppointment`, {
         }
     };
 };

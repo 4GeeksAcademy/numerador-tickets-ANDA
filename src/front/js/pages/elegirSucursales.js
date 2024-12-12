@@ -1,44 +1,24 @@
-import React, {useState} from "react";
+import React, {useState, useContext} from "react";
+import { Context } from "../store/appContext"; 
+import { useNavigate } from "react-router-dom";
 
-const SucursalSelector = () => {
+const Sucursales = () => {
+    const { store, actions } = useContext(Context);
+    const navigate = useNavigate();
     const [selectedBranch, setSelectedBranch] = useState("");
-  
     const handleBranchChange = (event) => {
       setSelectedBranch(event.target.value);
     };
-  
     const handleSubmit = (event) => {
       event.preventDefault();
       if (selectedBranch) {
-       /* alert(Sucursal seleccionada, ${selectedBranch}); */
+        actions.setSelectedBranch(selectedBranch);
+        navigate("/fecha");
       } else {
         alert("Selecciona una sucursal.");
-      }
+      }   
     };
-  
-    const branches = [
-      "Casa Central",
-      "Alquileres",
-      "Centro",
-      "Canelones",
-      "Cerro Largo",
-      "Colonia",
-      "Durazno",
-      "Flores",
-      "Florida",
-      "Lavalleja",
-      "Maldonado",
-      "Paysandu",
-      "Rio Negro",
-      "Rivera",
-      "Rocha",
-      "Salto",
-      "San Jose",
-      "Soriano",
-      "Tacuarembo",
-      "Treinta y Tres",
-    ];
-  
+    const branches = store.sucursales;
     return (
       <div className="container mt-5">
         <img
@@ -78,5 +58,4 @@ const SucursalSelector = () => {
       </div>
     );
   };
-  
-  export default SucursalSelector;
+  export default Sucursales;

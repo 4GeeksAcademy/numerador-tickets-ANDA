@@ -2,10 +2,12 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User
+from api.models import db, User, Appointment
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
+from werkzeug.security import generate_password_hash, check_password_hash
+from api.register_template import register_template
 
 import smtplib
 
@@ -25,27 +27,20 @@ sender_password = os.getenv("SMTP_APP_PASSWORD")
 smtp_host = os.getenv("SMTP_HOST")
 smtp_port = os.getenv("SMTP_PORT")
 
-receivers_emails = ["test@gmail.com"]
+receivers_emails = os.getenv("RECIEVERS_EMAIL").split(",")
 
 def send_singup_email(receivers_emails):
     message  = MIMEMultipart("alternative")
 
     message["Subject"] = "Bienvenido a Tickets Anda 🐬🌈"
-    message["From"] = os.getenv("SMTP_USERNAME")
-
+    message["From"] = "budaenpantuflas@gmail.com"
+    message["Reply-To"] = "budaenpantuflas@gmail.com"
+  
     message["To"] = ", ".join(receivers_emails)
 
-    html_content = """
-        <html>
-            <body>
-                <h1>¡Hola! 🐬🌈</h1>
-                <p>Este es un correo de prueba enviado desde el API de Ticket Anda.</p>
-                <p>¡Saludos!</p>
-            </body>
-        </html>
-    """
+    html_content = register_template
 
-    text_content = "¡Hola!\n🐬🌈 Este es un correo de prueba enviado desde el API de Ticket Anda.\n¡Saludos!"
+    text_content = "Bienvenido a ReserVAnda. Puedes comenzar a utilizar nuestro servicio de reserva online."
 
     message.attach(MIMEText(text_content, "plain"))
     message.attach(MIMEText(html_content, "html"))
@@ -54,6 +49,7 @@ def send_singup_email(receivers_emails):
     server.starttls()
     server.login(sender_email, sender_password)
     server.sendmail(sender_email, receivers_emails, message.as_string())
+    print(f"Correo enviado a: {receivers_emails}")
     server.quit()
     
                 
@@ -62,7 +58,7 @@ def send_singup_email(receivers_emails):
 def send_email():
     message  = MIMEMultipart("alternative")
     message["Subject"] = "Prueba de envío de correo - Ticket Anda 🐬🌈"
-    message["From"] = ""
+    message["From"] = "budaenpantuflas@gmail.com"
     message["To"] = ", ".join(receivers_emails)
     
     html_content = """
@@ -111,15 +107,20 @@ def signup():
     name = data.get('name')
     email = data.get('email')
     password = data.get('password')
+    hashed_password = generate_password_hash(password)
 
-    existing_user = User.query.filter((User.doc_id == doc_id)).first()
-    if existing_user:
-        return jsonify({"msg": "Usuario ya existe"}), 401
+    existing_user_by_doc = User.query.filter_by(doc_id=doc_id).first()
+    if existing_user_by_doc:
+        return jsonify({"msg": "Error: El documento de identidad ya está registrado. Por favor, usa otro documento o inicia sesión."}), 401
+    
+    existing_user_by_email = User.query.filter_by(email=email).first()
+    if existing_user_by_email:
+        return jsonify({"msg": "Error: El correo ya está registrado. Por favor, usa otro correo o inicia sesión."}), 400
     
     if name == None:
         name = "Unknown"
 
-    new_user = User(doc_id=doc_id, name=name, email=email, password=password)
+    new_user = User(doc_id=doc_id, name=name, email=email, password=hashed_password)
     db.session.add(new_user)
     db.session.commit()
     send_singup_email([email])
@@ -136,11 +137,14 @@ def login():
     if user == None:
         return jsonify({"msg": "Bad document ID or password"}), 401
 
-    if user.password != password:
+    is_valid = check_password_hash(user.password, password)
+
+    if is_valid:
+        access_token = create_access_token(identity=doc_id)
+        return jsonify({"msg": "Login exitoso", "access_token": access_token}), 200
+    else:
         return jsonify({"msg": "Bad document ID or password"}), 401
 
-    access_token = create_access_token(identity=doc_id)
-    return jsonify(access_token=access_token), 201
 
 @api.route("/protected", methods=["GET"])
 @jwt_required()
@@ -156,8 +160,68 @@ def get_current_user():
     user = User.query.filter_by(doc_id=current_user).first()
     if user:
         return jsonify({
+            "id": user.id,
             "doc_id": user.doc_id,
             "name": user.name
         }), 200
     print("User not found in the database.")
     return jsonify({"msg": "User not found"}), 404
+
+    #Agregar clase POST, DELETE y GET para reservas. Post en vista crear reserva, 
+    # delete en el onclick del botón en "mis reservas" y Get en la vista de "mis reservas"
+@api.route('/appointments', methods=['POST'])
+def create_appointment():
+
+    data = request.json
+    user_id = data.get('user_id')
+    datetime = data.get('datetime')
+    branch = data.get('branch')
+    speciality = data.get('speciality')
+
+    if not all([user_id, datetime, branch, speciality]):
+        return jsonify({"msg": "Todos los campos son requeridos"}), 400
+
+    try:
+         # Ya existe?
+        existing_appointment = Appointment.query.filter_by(datetime=datetime, branch=branch).first()
+        if existing_appointment:
+            return jsonify({"msg": "La fecha y hora seleccionada ya están ocupadas"}), 400
+
+        new_appointment = Appointment(user_id=user_id, datetime=datetime, branch=branch, speciality=speciality)
+        db.session.add(new_appointment)
+        db.session.commit()
+
+        return jsonify(new_appointment.serialize()), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"msg": str(e)}), 500
+
+@api.route('/appointments', methods=['GET'])
+@jwt_required()
+def get_appointments():
+    
+    current_user = get_jwt_identity()
+    user = User.query.filter_by(doc_id=current_user).first()
+
+    if not user:
+        return jsonify({"msg": "Usuario no encontrado"}), 404
+
+    appointments = Appointment.query.filter_by(user_id=user.id).all()
+    return jsonify([appointment.serialize() for appointment in appointments]), 200
+
+@api.route('/appointments/<int:appointment_id>', methods=['DELETE'])
+@jwt_required()
+def delete_appointment(appointment_id):
+ 
+    try:
+        appointment = Appointment.query.get(appointment_id)
+        if not appointment:
+            return jsonify({"msg": "Reserva no encontrada"}), 404
+
+        db.session.delete(appointment)
+        db.session.commit()
+        return jsonify({"msg": "Reserva eliminada exitosamente"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"msg": str(e)}), 500
+#hacer nuevo endpoint para mandar correos de reserva.
