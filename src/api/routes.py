@@ -224,46 +224,45 @@ def delete_appointment(appointment_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({"msg": str(e)}), 500
-#hacer nuevo endpoint para mandar correos de reserva.
 
 # Endpoint para actualizar usuario
 
 @api.route("/update-user", methods=['PUT'])
-@jwt_required() # Requiere autenticación con JWT
+@jwt_required()  
 def update_user():
     try:
-        # Obtén el ID del usuario desde el token JWT
+  
         doc_id = get_jwt_identity()
-        # Datos enviados desde el frontend
+
+
         data = request.json
 
-        # Validar que todos los campos estén presentes
         email = data.get('email')
-        phone = data.get('phone')
-        address = data.get('address')
         name = data.get('name')
 
-        if not email or not phone or not address or not name:
+        if not email or not name:
             return jsonify({"msg": "Todos los campos son obligatorios"}), 400
 
-        # Buscar el usuario en la base de datos
+   
         user = User.query.filter_by(doc_id=doc_id).one_or_none()
         if not user:
             return jsonify({"msg": "Usuario no encontrado"}), 404
 
-        # Actualizar los datos del usuario
+ 
+        existing_user = User.query.filter_by(email=email).first()
+        if existing_user and existing_user.doc_id != doc_id:
+            return jsonify({"msg": "El correo electrónico ya está en uso por otro usuario"}), 400
+
+  
         user.email = email
-        user.phone = phone
-        user.address = address
         user.name = name
 
-        # Guardar los cambios en la base de datos
-        new_data = User(email=email, name=name)
-        db.session.add(new_data)
+     
         db.session.commit()
 
         return jsonify({"msg": "Datos actualizados con éxito"}), 200
 
     except Exception as e:
         print(f"Error al actualizar el usuario: {e}")
+        db.session.rollback()
         return jsonify({"msg": "Error interno del servidor"}), 500
