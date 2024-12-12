@@ -65,7 +65,7 @@ const EditProfile = () => {
             }
         } catch (error) {
             console.error("Error en la solicitud:", error);
-            setMessage("Hubo un error al conectar con el servidor.");
+            setMessage("Hubo un error al conectar con el servidor.", token);
         }
     };
 

@@ -228,12 +228,12 @@ def delete_appointment(appointment_id):
 
 # Endpoint para actualizar usuario
 
-@api.route('api/update-user', methods=['PUT'])
+@api.route("/update-user", methods=['PUT'])
 @jwt_required() # Requiere autenticación con JWT
 def update_user():
     try:
         # Obtén el ID del usuario desde el token JWT
-        user_id = get_jwt_identity()
+        doc_id = get_jwt_identity()
         # Datos enviados desde el frontend
         data = request.json
 
@@ -247,7 +247,7 @@ def update_user():
             return jsonify({"msg": "Todos los campos son obligatorios"}), 400
 
         # Buscar el usuario en la base de datos
-        user = User.query.get(user_id)
+        user = User.query.filter_by(doc_id=doc_id).one_or_none()
         if not user:
             return jsonify({"msg": "Usuario no encontrado"}), 404
 
@@ -258,7 +258,7 @@ def update_user():
         user.name = name
 
         # Guardar los cambios en la base de datos
-        new_data = User(email=email, phone=phone, address=address, name=name)
+        new_data = User(email=email, name=name)
         db.session.add(new_data)
         db.session.commit()
 
