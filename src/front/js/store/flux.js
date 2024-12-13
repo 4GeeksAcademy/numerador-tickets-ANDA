@@ -303,8 +303,6 @@ const getState = ({ getStore, getActions, setStore }) => {
                     return { success: false, message: "Hubo un error al conectar con el servidor." };
                 }
             },
-            //Hacer un action para enviarMailReserva
-            //const response = await fetch(`${process.env.BACKEND_URL}api/sendMailAppointment`, {
         }
     };
 };

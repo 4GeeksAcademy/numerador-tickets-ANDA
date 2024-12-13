@@ -20,7 +20,7 @@ from email.mime.multipart import MIMEMultipart
 api = Blueprint('api', __name__)
 
 # Allow CORS requests to this API
-CORS(api)
+CORS(api, resources={r"/*": {"origins": "*"}})
 
 sender_email = os.getenv("SMTP_USERNAME")
 sender_password = os.getenv("SMTP_APP_PASSWORD")
@@ -51,7 +51,51 @@ def send_singup_email(receivers_emails):
     server.sendmail(sender_email, receivers_emails, message.as_string())
     print(f"Correo enviado a: {receivers_emails}")
     server.quit()
-    
+
+def send_new_appointment_email(receivers_emails, datetime, branch, speciality):
+    message  = MIMEMultipart("alternative")
+
+    message["Subject"] = "Nueva reserva creada 🐬🌈"
+    message["From"] = "budaenpantuflas@gmail.com"
+    message["Reply-To"] = "budaenpantuflas@gmail.com"
+  
+    message["To"] = ", ".join(receivers_emails)
+
+    date, time = datetime.split(" ")
+
+    html_content = f"""
+        <html>
+            <body>
+                <h1>¡Hola! 🐬🌈</h1>
+                <p>Tu nueva reserva ha sido creada con éxito. Aquí tienes los detalles:</p>
+                <p><strong>Fecha:</strong> {date}</p>
+                <p><strong>Hora:</strong> {time}</p>
+                <p><strong>Especialidad:</strong> {speciality}</p>
+                <p><strong>Sucursal:</strong> {branch}</p>
+                <p>Gracias por utilizar nuestro servicio de reserva.</p>
+            </body>
+        </html>
+    """
+
+    text_content = f"""
+        ¡Hola! 🐬🌈
+        Tu nueva reserva ha sido creada con éxito. Aquí tienes los detalles:
+        Fecha: {date}
+        Hora: {time}
+        Especialidad: {speciality}
+        Sucursal: {branch}
+        Gracias por utilizar nuestro servicio de reserva.
+    """
+
+    message.attach(MIMEText(text_content, "plain"))
+    message.attach(MIMEText(html_content, "html"))
+
+    server = smtplib.SMTP(smtp_host, smtp_port)
+    server.starttls()
+    server.login(sender_email, sender_password)
+    server.sendmail(sender_email, receivers_emails, message.as_string())
+    print(f"Correo enviado a: {receivers_emails}")
+    server.quit()    
                 
 
 @api.route('/send-email', methods=['POST'])
@@ -170,6 +214,7 @@ def get_current_user():
     #Agregar clase POST, DELETE y GET para reservas. Post en vista crear reserva, 
     # delete en el onclick del botón en "mis reservas" y Get en la vista de "mis reservas"
 @api.route('/appointments', methods=['POST'])
+@jwt_required()
 def create_appointment():
 
     data = request.json
@@ -177,6 +222,9 @@ def create_appointment():
     datetime = data.get('datetime')
     branch = data.get('branch')
     speciality = data.get('speciality')
+    current_user_doc_id = get_jwt_identity()
+    user = User.query.filter_by(doc_id=current_user_doc_id).first()
+    user_email = user.email
 
     if not all([user_id, datetime, branch, speciality]):
         return jsonify({"msg": "Todos los campos son requeridos"}), 400
@@ -190,6 +238,7 @@ def create_appointment():
         new_appointment = Appointment(user_id=user_id, datetime=datetime, branch=branch, speciality=speciality)
         db.session.add(new_appointment)
         db.session.commit()
+        send_new_appointment_email(user_email, datetime, branch, speciality)
 
         return jsonify(new_appointment.serialize()), 201
     except Exception as e:
