@@ -24,7 +24,6 @@ const ScheduleSelector = () => {
   const { store, actions } = useContext(Context);
   const navigate = useNavigate();
   const [msg, setMsg] = useState("");
-  console.log(store.selectedDate, selectedTime, store.selectedService, store.selectedBranch)
 
   const handleSelect = (index) => {
     setSelectedTime(initialSchedule[index].time);
@@ -42,7 +41,6 @@ const ScheduleSelector = () => {
       setMsg(response.message);
   } else {
       setMsg("Reserva creada correctamente.");
-      //store.actions.enviarMailReserva()
       navigate("/");
   }
   };
