@@ -6,17 +6,20 @@ console.warn = (...args) => {
     originalWarn(...args);
 };
 
-//import react into the bundle
+
 import React from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client"; 
 
-//include your index.scss file into the bundle
-import "../styles/index.css";
 
-//import your own components
+import "../styles/index.css"; 
+
+
 import Layout from "./layout";
-// import "bootstrap/dist/css/bootstrap.min.css";  Agus: Este cambio me rompe la interface, no encuentra el módulo. El bootstrap está importado como script en el tempolate.
 
 
-//render your react application
-ReactDOM.render(<Layout />, document.querySelector("#app"));
+const rootElement = document.querySelector("#app");
+
+
+const root = createRoot(rootElement);
+root.render(<Layout />);
+
