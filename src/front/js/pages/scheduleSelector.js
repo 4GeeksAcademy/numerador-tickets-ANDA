@@ -17,38 +17,50 @@ const ScheduleSelector = () => {
     { time: "13:00", available: true },
     { time: "13:30", available: true },
   ];
-  
 
   const [selectedTime, setSelectedTime] = useState(null);
   const [isReserved, setIsReserved] = useState(false);
   const { store, actions } = useContext(Context);
   const navigate = useNavigate();
   const [msg, setMsg] = useState("");
-  console.log(store.selectedDate, selectedTime, store.selectedService, store.selectedBranch)
 
   const handleSelect = (index) => {
     setSelectedTime(initialSchedule[index].time);
   };
 
   const handleReservation = async () => {
+    // Crear la reserva en la base de datos
     const response = await actions.createReservation(
+      store.selectedDate,
+      selectedTime,
+      store.selectedService,
+      store.selectedBranch
+    );
+
+    if (!response.success) {
+      setMsg(response.message);
+    } else {
+      // Intentar enviar el correo electrónico después de crear la reserva
+      const emailResponse = await actions.sendMailReservation(
+        store.user.email, // Email del usuario
         store.selectedDate,
         selectedTime,
         store.selectedService,
         store.selectedBranch
-    );
+      );
 
-    if(!response.success) {
-      setMsg(response.message);
-  } else {
-      setMsg("Reserva creada correctamente.");
-      //store.actions.enviarMailReserva()
-      navigate("/");
-  }
+      if (!emailResponse.success) {
+        setMsg("Reserva creada, pero no se pudo enviar el correo.");
+      } else {
+        setMsg("Reserva creada correctamente. Correo enviado.");
+      }
+
+      setIsReserved(true);
+    }
   };
 
   const handleViewReservations = () => {
-    navigate("/");
+    navigate("/"); // Redirigir a la página de reservas
   };
 
   if (isReserved) {
@@ -88,7 +100,6 @@ const ScheduleSelector = () => {
           className="d-block mx-auto mb-2"
           style={{ width: "100px" }}
         />
-
         <div className="mb-4 text-center text-primary">
           <div>
             {store.selectedDate ? (

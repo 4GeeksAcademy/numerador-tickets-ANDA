@@ -272,6 +272,64 @@ const getState = ({ getStore, getActions, setStore }) => {
             },
             //Hacer un action para enviarMailReserva
             //const response = await fetch(`${process.env.BACKEND_URL}api/sendMailAppointment`, {
+
+            sendMailReservation: async (user, date, time, specialty, branch) => {
+                try {
+                    const response = await fetch(`${process.env.BACKEND_URL}api/sendMailAppointment`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            user_email: user.email,
+                            appointment_date: `${date} ${time}`,
+                            specialty,
+                            branch,
+                        }),
+                    });
+            
+                    const data = await response.json();
+            
+                    if (!response.ok) {
+                        return { success: false, message: data.msg || "Error al enviar el correo de la reserva" };
+                    }
+            
+                    return { success: true, message: "Correo de reserva enviado exitosamente" };
+                } catch (error) {
+                    console.error("Error al enviar el correo de reserva:", error);
+                    return { success: false, message: "Error inesperado al enviar el correo de reserva" };
+                }
+
+                sendMailReservation: async (user, date, time, specialty, branch) => {
+                    try {
+                        const response = await fetch(`${process.env.BACKEND_URL}api/sendMailAppointment`, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify({
+                                user_email: user.email,
+                                appointment_date: `${date} ${time}`,
+                                specialty,
+                                branch,
+                            }),
+                        });
+                
+                        const data = await response.json();
+                
+                        if (!response.ok) {
+                            return { success: false, message: data.msg || "Error al enviar el correo de la reserva" };
+                        }
+                
+                        return { success: true, message: "Correo de reserva enviado exitosamente" };
+                    } catch (error) {
+                        console.error("Error al enviar el correo de reserva:", error);
+                        return { success: false, message: "Error inesperado al enviar el correo de reserva" };
+                    }
+                }
+                
+            }
+            
         }
     };
 };

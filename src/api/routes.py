@@ -8,6 +8,8 @@ from flask_cors import CORS
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 from werkzeug.security import generate_password_hash, check_password_hash
 from api.register_template import register_template
+from api.register_template import reserva_template
+
 
 import smtplib
 
@@ -224,4 +226,50 @@ def delete_appointment(appointment_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({"msg": str(e)}), 500
+    
 #hacer nuevo endpoint para mandar correos de reserva.
+@api.route('/send-reservation-email', methods=['POST'])
+def send_reservation_email():
+    """Enviar un correo de confirmación o detalles de la reserva."""
+    data = request.json
+    
+    # Validar datos de entrada
+    user_email = data.get('email')
+    appointment_details = data.get('appointment_details')  # Ejemplo: diccionario con los detalles de la reserva
+
+    if not user_email or not appointment_details:
+        return jsonify({"msg": "El correo del usuario y los detalles de la reserva son requeridos."}), 400
+
+    # Construir el contenido del correo
+    subject = "Detalles de tu reserva - Ticket Anda 🐬🌈"
+    text_content = f"Hola,\n\nEstos son los detalles de tu reserva:\n\n" + \
+                   f"Fecha y hora: {appointment_details.get('datetime')}\n" + \
+                   f"Sucursal: {appointment_details.get('branch')}\n" + \
+                   f"Especialidad: {appointment_details.get('speciality')}\n\n" + \
+                   "Gracias por confiar en nosotros."
+
+    html_content = reserva_template
+
+    try:
+        # Crear mensaje
+        message = MIMEMultipart("alternative")
+        message["Subject"] = subject
+        message["From"] = sender_email
+        message["To"] = user_email
+
+        # Adjuntar contenido
+        message.attach(MIMEText(text_content, "plain"))
+        message.attach(MIMEText(html_content, "html"))
+
+        # Enviar correo
+        server = smtplib.SMTP(smtp_host, smtp_port)
+        server.starttls()
+        server.login(sender_email, sender_password)
+        server.sendmail(sender_email, user_email, message.as_string())
+        server.quit()
+
+        return jsonify({"msg": "Correo de reserva enviado exitosamente."}), 200
+
+    except Exception as e:
+        return jsonify({"msg": f"Error al enviar el correo: {str(e)}"}), 500
+
