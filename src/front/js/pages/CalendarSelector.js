@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { format, startOfMonth, endOfMonth, addDays, subMonths, addMonths, isSameDay, isBefore } from "date-fns";
 import { Context } from "../store/appContext";
 import "../../styles/ScheduleDate.css";
-import logoAnda from "../../img/logo_anda.png";
 
 const CalendarSelector = () => {
     const [selectedDate, setSelectedDate] = useState(new Date());
@@ -44,14 +43,14 @@ const CalendarSelector = () => {
     return (
         <div className="container my-5 d-flex justify-content-center">
             <div className="card p-4 shadow-lg text-center">
-                <img src={logoAnda} alt="Logo ANDA" className="logo-anda mb-4" />
+                
                 <div className="d-flex justify-content-between align-items-center mb-4">
                     <button onClick={handlePrevMonth} className="btn btn-outline-primary">
-                        Mes anterior
+                    <i class="fa-solid fa-left-long"></i>
                     </button>
                     <h4 className="text-primary mb-0">{format(currentMonth, "MMMM yyyy")}</h4>
                     <button onClick={handleNextMonth} className="btn btn-outline-primary">
-                        Mes siguiente
+                    <i class="fa-solid fa-right-long"></i>
                     </button>
                 </div>
                 <div className="calendar-grid">

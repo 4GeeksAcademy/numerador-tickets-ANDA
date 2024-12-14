@@ -20,15 +20,9 @@ const Sucursales = () => {
     };
     const branches = store.sucursales;
     return (
-      <div className="container mt-5">
-        <img
-          src="https://logoteca.uy/wp-content/uploads/sites/3/2024/09/Logo-ANDA.svg"
-          alt="Logo Anda"
-          className="mb-4"
-          style={{ maxWidth: "150px" }}
-        />
-        <h2 className="mb-4">Selecciona una sucursal</h2>
-        <form onSubmit={handleSubmit}>
+      <div className="content d-flex flex-column justify-content-center align-items-center">
+        <h2 className="mb-4 my-5">Selecciona una sucursal</h2>
+        <form className="w-50 text-center" onSubmit={handleSubmit}>
           <div className="mb-3">
             <label htmlFor="branch" className="form-label">
               <b>Sucursales</b>
@@ -36,7 +30,7 @@ const Sucursales = () => {
             <select
               name="branch"
               id="branch"
-              className="form-select w-50"
+              className="form-select w-100"
               value={selectedBranch}
               onChange={handleBranchChange}
               required

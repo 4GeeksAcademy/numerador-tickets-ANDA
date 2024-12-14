@@ -1,7 +1,11 @@
 /* 
     General Styles used on every website (Don't Repeat Yourself)
 */
-
+body {
+    font-family: "Montserrat", sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+}
 .celeste, .celeste a {
     display: inline-block;
     color:  #3865E5;
@@ -52,4 +56,12 @@
 /* Espaciado en los elementos del formulario */
 .edit-profile-container .form-control {
     margin-bottom: 15px;
+}
+
+.navbar{
+    background-color: #3865E5 !important;
+}
+
+.navbar span, .navbar button, .navbar a{
+    color: white !important;
 }

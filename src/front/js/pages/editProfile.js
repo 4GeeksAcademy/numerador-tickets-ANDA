@@ -17,7 +17,9 @@ const EditProfile = () => {
     const handleInputChange = (e) => {
         const { id, value } = e.target;
         if (id === "email") setEmail(value);
+        // else if (email == "") setEmail(store.user.email);
         else if (id === "name") setName(value);
+       // if (name == "") setName(store.user.name);
     };
 
     // Función para enviar datos al backend

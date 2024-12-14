@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import { Link, useNavigate  } from "react-router-dom";
 import { Context } from "../store/appContext";
-import logoAnda from "../../img/logo_anda.png";
+import logoAnda from "../../img/logo_anda_fondo_azul.png";
 
 export const Navbar = () => {
 	const { store, actions } = useContext(Context);
@@ -29,7 +29,7 @@ export const Navbar = () => {
     };
 	return (
 		<nav className="navbar navbar-light bg-light bg-body-tertiary">
-			<div className="container-fluid d-flex justify-content-between align-items-start">
+			<div className="container-fluid d-flex align-items-center justify-content-between align-items-start">
 				
 				<div className="logo-container">
 					<Link to="/" className="logo-link">

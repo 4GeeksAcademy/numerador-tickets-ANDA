@@ -36,9 +36,9 @@ class User(db.Model):
 class Appointment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    datetime = db.Column(db.DateTime, unique=True, nullable=False)
-    branch = db.Column(db.String(120), unique=True, nullable=False)
-    speciality = db.Column(db.String(80), unique=False, nullable=False)
+    datetime = db.Column(db.DateTime, nullable=False)
+    branch = db.Column(db.String(120), nullable=False)
+    speciality = db.Column(db.String(80), nullable=False)
 
     user = db.relationship('User', backref=db.backref('appointment', lazy=True))
    

@@ -26,22 +26,16 @@ const MyReservations = () => {
     <div className="d-flex flex-column align-items-center min-vh-100">
       {msg && <p style={{ color: msg.includes("correctamente") ? "green" : "red" }}>{msg}</p>}
       <div
-        className="card p-3 shadow-lg border-0"
-        style={{ maxWidth: "400px", width: "100%" }}
+        className="card w-100 p-3 justify-space-between shadow-lg border-0"
+
       >
-        <img
-          src="https://logoteca.uy/wp-content/uploads/sites/3/2024/09/Logo-ANDA.svg"
-          alt="Logo ANDA"
-          className="d-block mx-auto mb-2"
-          style={{ width: "100px" }}
-        />
         <h2 className="text-center text-primary h5">Mis reservas</h2>
-        <ul className="list-group">
+        <div className="row">
           {store.reservations.length > 0 ? (
             store.reservations.map((reservation, index) => (
-              <li
+              <div
                 key={index}
-                className="list-group-item d-flex justify-content-between align-items-center"
+                className="list-group-item col d-flex justify-content-between align-items-center"
               >
                 <div>
                   <p className="m-0">
@@ -59,12 +53,12 @@ const MyReservations = () => {
                 >
                   Borrar Reserva
                 </button>
-              </li>
+              </div>
             ))
           ) : (
-            <li className="list-group-item">No hay ninguna reserva realizada.</li>
+            <div className="list-group-item">No hay ninguna reserva realizada.</div>
           )}
-        </ul>
+        </div>
       </div>
       <div className="mt-4">
         <Link to="/elegir-servicio" className="btn btn-primary">

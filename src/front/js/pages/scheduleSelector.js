@@ -51,15 +51,9 @@ const ScheduleSelector = () => {
 
   if (isReserved) {
     return (
-      <div className="d-flex justify-content-center align-items-center min-vh-100 m-0">
+      <div className="d-flex justify-content-center m-0">
         {msg && <p style={{ color: msg.includes("correctamente") ? "green" : "red" }}>{msg}</p>}
         <div className="card p-3 shadow-lg border-0" style={{ maxWidth: "400px" }}>
-          <img
-            src="https://logoteca.uy/wp-content/uploads/sites/3/2024/09/Logo-ANDA.svg"
-            alt="Logo ANDA"
-            className="d-block mx-auto mb-2"
-            style={{ width: "100px" }}
-          />
           <h2 className="text-center text-primary h5">¡Reserva realizada con éxito!</h2>
           {store.selectedDate ? (
             <h3>Fecha seleccionada: {new Date(store.selectedDate).toLocaleDateString()}</h3>
@@ -78,14 +72,8 @@ const ScheduleSelector = () => {
   }
 
   return (
-    <div className="d-flex justify-content-center align-items-center min-vh-100 m-0">
+    <div className="d-flex justify-content-center m-0">
       <div className="card p-2 shadow-lg border-0" style={{ maxWidth: "400px", width: "100%" }}>
-        <img
-          src="https://logoteca.uy/wp-content/uploads/sites/3/2024/09/Logo-ANDA.svg"
-          alt="Logo ANDA"
-          className="d-block mx-auto mb-2"
-          style={{ width: "100px" }}
-        />
 
         <div className="mb-4 text-center text-primary">
           <div>
