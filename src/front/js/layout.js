@@ -16,7 +16,6 @@ import  Sucursales  from "./pages/elegirSucursales";
 import { ElegirServicio } from "./pages/elegirServicio";
 
 import { Navbar } from "./component/navbar";
-import { Footer } from "./component/footer";
 import { WithNavbar } from "./component/withNavbar";
 import ProtectedRoute from "./component/protectedRoute";
 
@@ -88,7 +87,6 @@ const Layout = () => {
 
                         </Route>
                     </Routes>
-                    <Footer />
                 </ScrollToTop>
             </BrowserRouter>
         </div>

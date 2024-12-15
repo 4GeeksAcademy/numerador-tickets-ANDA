@@ -42,7 +42,7 @@ const CalendarSelector = () => {
 
     return (
         <div className="container my-5 d-flex justify-content-center">
-            <div className="card p-4 shadow-lg text-center">
+            <div className="card p-2 shadow-lg text-center">
                 
                 <div className="d-flex justify-content-between align-items-center mb-4">
                     <button onClick={handlePrevMonth} className="btn btn-outline-primary">

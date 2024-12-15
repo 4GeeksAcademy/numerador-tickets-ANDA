@@ -65,3 +65,26 @@ body {
 .navbar span, .navbar button, .navbar a{
     color: white !important;
 }
+
+.boton-hamburguesa{
+        background-image: linear-gradient(
+          to bottom,
+          white 20%,
+          transparent 20%,
+          transparent 40%,
+          white 40%,
+          white 60%,
+          transparent 60%,
+          transparent 80%,
+          white 80%
+        );
+        background-repeat: no-repeat;
+        background-size: 80% 80%;
+}
+.navbar-nav{
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+.nav-link:hover{
+    transform: scale(1.1);
+
+}
