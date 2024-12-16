@@ -46,11 +46,11 @@ const CalendarSelector = () => {
                 
                 <div className="d-flex justify-content-between align-items-center mb-4">
                     <button onClick={handlePrevMonth} className="btn btn-outline-primary">
-                    <i class="fa-solid fa-left-long"></i>
+                    <i className="fa-solid fa-left-long"></i>
                     </button>
                     <h4 className="text-primary mb-0">{format(currentMonth, "MMMM yyyy")}</h4>
                     <button onClick={handleNextMonth} className="btn btn-outline-primary">
-                    <i class="fa-solid fa-right-long"></i>
+                    <i className="fa-solid fa-right-long"></i>
                     </button>
                 </div>
                 <div className="calendar-grid">
