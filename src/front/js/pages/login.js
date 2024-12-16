@@ -44,14 +44,24 @@ export const Login = () =>{
         <div className="container text-center">
             <Link to="/">
                 
-                {logo ? (
-                    <img className="img-fluid w-50 mx-auto" src={logo} alt="Logo Anda" />
-                ) : (
-                    <p>Cargando logo...</p>
-                )}
+            {logo ? (
+    <img
+        className="img-fluid"
+        src={logo}
+        alt="Logo Anda"
+        style={{ 
+            maxWidth: "200px", 
+            height: "auto",    
+            marginBottom: "20px" 
+        }}
+    />
+) : (
+    <p>Cargando logo...</p>
+)}
+
             </Link>
             {error && <p style={{ color: error.includes("success") ? "green" : "red" }}>{error}</p>}
-            <main className="form-signin w-100 m-auto">
+            <main className="form-signin w-100 m-auto" style={{ maxWidth: "400px" }}>
                 <form onSubmit={handleSubmit}>
                     <h1 className="h3 my-5 fw-normal celeste">Ingrese su CI y su Contraseña:</h1>
                     <div className="form-floating mb-3">
