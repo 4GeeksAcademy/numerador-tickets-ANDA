@@ -28,10 +28,14 @@ export const Signup = () => {
     return(
         <div className="container text-center">
             <Link to="/">
-                <img className="img-fluid w-50 mx-auto" src={logoAnda} />
+                <img className="img-fluid w-50 mx-auto" src={logoAnda} style={{
+        maxWidth: "200px",
+        height: "auto",
+        marginBottom: "20px"
+    }} />
             </Link>
             {message && <p style={{ color: message.includes("Error") ? "red" : "green" }}>{message}</p>}
-            <main className="form-signin w-100 m-auto">
+            <main className="form-signin w-100 m-auto" style={{ maxWidth: "400px" }}>
                 <form onSubmit={handleSubmit}>
                     <h1 className="h3 my-5 fw-normal celeste">Ingrese sus datos personales:</h1>
                     <div className="form-floating mb-3">

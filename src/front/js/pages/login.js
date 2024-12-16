@@ -44,8 +44,7 @@ export const Login = () =>{
         <div className="container text-center">
             <Link to="/">
                 
-            {logo ? (
-    <img
+            {logo ? (<img
         className="img-fluid"
         src={logo}
         alt="Logo Anda"
@@ -53,11 +52,10 @@ export const Login = () =>{
             maxWidth: "200px", 
             height: "auto",    
             marginBottom: "20px" 
-        }}
-    />
-) : (
+         }}  />
+    ) : (
     <p>Cargando logo...</p>
-)}
+    )}
 
             </Link>
             {error && <p style={{ color: error.includes("success") ? "green" : "red" }}>{error}</p>}
