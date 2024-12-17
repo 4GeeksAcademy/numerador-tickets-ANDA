@@ -303,6 +303,51 @@ const getState = ({ getStore, getActions, setStore }) => {
                     return { success: false, message: "Hubo un error al conectar con el servidor." };
                 }
             },
+            recoverPassword: async (email) => {
+                try {
+                    const response = await fetch(`${process.env.BACKEND_URL}api/recover-password`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ email }),
+                    });
+            
+                    const data = await response.json();
+                    if (!response.ok) {
+                        return { success: false, message: data.msg || "Error al enviar el correo de recuperación" };
+                    }
+            
+                    return { success: true, message: "Correo de recuperación enviado" };
+                } catch (error) {
+                    console.error("Error al enviar el correo de recuperación:", error);
+                    return { success: false, message: "Error inesperado" };
+                }
+            },
+            resetPassword: async (token, newPassword) => {
+                try {
+                    const response = await fetch(
+                        `${process.env.BACKEND_URL}api/reset-password`,
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify({ token, password: newPassword }),
+                        }
+                    );
+
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        return { success: false, message: data.msg || "Error al restablecer la contraseña" };
+                    }
+
+                    return { success: true, message: "Contraseña restablecida exitosamente" };
+                } catch (error) {
+                    console.error("Error en resetPassword:", error);
+                    return { success: false, message: "Error inesperado al restablecer la contraseña" };
+                }
+            },
+            
         }
     };
 };

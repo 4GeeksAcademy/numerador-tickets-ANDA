@@ -1,7 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom"; 
 import { Context } from "../store/appContext";
-//import logoAnda from "../../img/logo_anda.png";  Quedó obsoleto al usar la api de Cloudinary
 
 export const Login = () =>{
     const { store, actions } = useContext(Context);
@@ -10,6 +9,9 @@ export const Login = () =>{
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [logo, setLogo] = useState("");
+    const [email, setEmail] = useState("");
+    const [modalMessage, setModalMessage] = useState("");
+    const [showModal, setShowModal] = useState(false);
 
     useEffect(() => {
         const fetchLogo = async () => {
@@ -40,6 +42,15 @@ export const Login = () =>{
         }
     };
 
+    const handleRecoverPassword = async () => {
+        const response = await actions.recoverPassword(email);
+        if (response.success) {
+            setModalMessage("Correo enviado, revise su casilla y siga los pasos.");
+        } else {
+            setModalMessage("Error al enviar el correo. Verifique el correo ingresado.");
+        }
+    };
+
     return(
         <div className="container text-center">
             <Link to="/">
@@ -60,6 +71,7 @@ export const Login = () =>{
                 )}
             </Link>
             {error && <p style={{ color: error.includes("success") ? "green" : "red" }}>{error}</p>}
+            
             <main className="form-signin w-100 m-auto" style={{ maxWidth: "400px" }}>
                 <form onSubmit={handleSubmit}>
                     <h1 className="h3 my-5 fw-normal celeste">Ingrese su CI y su Contraseña:</h1>
@@ -92,8 +104,60 @@ export const Login = () =>{
                     <div className="mt-3 celeste">
                         <Link to="/signup">¿No tiene cuenta? Registrese aquí</Link>
                     </div>
+
+                    <div className="mt-3 celeste">
+                        <a
+                            
+                            className=""
+                            onClick={() => setShowModal(true)}
+                        >
+                            ¿Olvidó su contraseña?
+                        </a>
+                    </div>
                 </form>
             </main>
+
+            {showModal && (
+                <div className="modal fade show d-block" tabIndex="-1" style={{ background: "rgba(0,0,0,0.5)" }}>
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h5 className="modal-title">Recuperar Contraseña</h5>
+                                <button type="button" className="btn-close" onClick={() => setShowModal(false)}></button>
+                            </div>
+                            <div className="modal-body">
+                                <p>Ingrese su correo para recuperar la contraseña:</p>
+                                <input
+                                    type="email"
+                                    className="form-control mb-3"
+                                    placeholder="Correo electrónico"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                />
+                                {modalMessage && <p className="text-success">{modalMessage}</p>}
+                            </div>
+                            <div className="modal-footer">
+                                <button
+                                    type="button"
+                                    className="btn btn-secondary"
+                                    onClick={() => setShowModal(false)}
+                                >
+                                    Cerrar
+                                </button>
+                                <button
+                                    type="button"
+                                    className="btn btn-primary"
+                                    onClick={handleRecoverPassword}
+                                    disabled={!email}
+                                >
+                                    Enviar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
         </div>
-    )
-}
+    );
+};

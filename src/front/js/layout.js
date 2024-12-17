@@ -18,6 +18,7 @@ import { ElegirServicio } from "./pages/elegirServicio";
 import { Navbar } from "./component/navbar";
 import { WithNavbar } from "./component/withNavbar";
 import ProtectedRoute from "./component/protectedRoute";
+import ResetPassword from "./component/resetPassword";
 
 //create your first component
 const Layout = () => {
@@ -35,6 +36,7 @@ const Layout = () => {
                         {/* Páginas sin Navbar */}
                         <Route path="/login" element={<Login />} />
                         <Route path="/signup" element={<Signup />} />
+                        <Route path="/reset-password/:token" element={<ResetPassword />} />
                         <Route path="*" element={<NotFound />} />
                         
                         {/* Páginas con Navbar */}

@@ -1,20 +1,18 @@
 """
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
-from flask import Flask, request, jsonify, url_for, Blueprint
+from flask import Flask, request, jsonify, url_for, Blueprint, send_from_directory
 from api.models import db, User, Appointment
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 from werkzeug.security import generate_password_hash, check_password_hash
 from api.register_template import register_template
-
 import smtplib
-
 import os
-
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+import base64
 
 
 api = Blueprint('api', __name__)
@@ -28,6 +26,27 @@ smtp_host = os.getenv("SMTP_HOST")
 smtp_port = os.getenv("SMTP_PORT")
 
 receivers_emails = os.getenv("RECIEVERS_EMAIL").split(",")
+
+def generate_token(email):
+    email_bytes = email.encode('utf-8')
+    token = base64.urlsafe_b64encode(email_bytes).decode('utf-8')
+    return token
+
+def decode_token(token):
+    try:
+        email_bytes = base64.urlsafe_b64decode(token)
+        return email_bytes.decode('utf-8')
+    except Exception as e:
+        return None
+
+@api.route("/", defaults={"path": ""})
+@api.route("/<path:path>")
+def serve(path):
+    public_folder = os.path.join(os.getcwd(), "public") 
+    if path != "" and os.path.exists(os.path.join(public_folder, path)):
+        return send_from_directory(public_folder, path)
+    else:
+        return send_from_directory(public_folder, "index.html")
 
 def send_singup_email(receivers_emails):
     message  = MIMEMultipart("alternative")
@@ -348,3 +367,61 @@ def change_password():
         print(f"Error al cambiar la contraseña: {e}")
         db.session.rollback()
         return jsonify({"msg": "Error interno del servidor."}), 500
+
+@api.route("/recover-password", methods=["POST"])
+def recover_password():
+    email = request.json.get("email")
+    if not email:
+        return jsonify({"msg": "El correo es requerido"}), 400
+    
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({"msg": "Usuario no encontrado"}), 404
+    
+    token = generate_token(email)
+    recovery_url = f"{os.getenv('FRONTEND_URL')}reset-password/{token}"   
+
+    message = MIMEMultipart("alternative")
+    message["Subject"] = "Recuperar Contraseña 🐬"
+    message["From"] = "budaenpantuflas@gmail.com"
+    message["To"] = email
+
+    html_content = f"""
+        <html>
+            <body>
+                <p>Haz clic en el enlace para restablecer tu contraseña:</p>
+                <a href="{recovery_url}">Recuperar Contraseña</a>
+            </body>
+        </html>
+    """
+    message.attach(MIMEText(html_content, "html"))
+
+    server = smtplib.SMTP(smtp_host, smtp_port)
+    server.starttls()
+    server.login(sender_email, sender_password)
+    server.sendmail(sender_email, receivers_emails, message.as_string())   
+    server.quit()
+
+    return jsonify({"msg": "Correo de recuperación enviado"}), 200
+
+@api.route("/reset-password", methods=["POST"])
+def reset_password():
+    data = request.json
+    token = data.get("token")
+    new_password = data.get("password")
+
+    if not token or not new_password:
+        return jsonify({"msg": "Token y contraseña son requeridos"}), 400
+
+    email = decode_token(token)
+    if not email:
+        return jsonify({"msg": "Token inválido"}), 400
+
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({"msg": "Usuario no encontrado"}), 404
+
+    user.password = generate_password_hash(new_password)
+    db.session.commit()
+
+    return jsonify({"msg": "Contraseña restablecida exitosamente"}), 200
